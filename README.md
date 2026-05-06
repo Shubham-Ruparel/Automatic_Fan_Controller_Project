@@ -165,8 +165,10 @@ Original BOM specified DHT22 (±0.5°C, ±2% RH). Available component was DHT11 
 
 ```
 .
-├── README.md          ← This file
-└── main.ino           ← Arduino sketch (upload via Arduino IDE)
+├── ES116_Demo_of_project.jpeg    ← Photo of full project in single frame
+├── README.md                     ← This file
+├── main.ino                      ← Arduino sketch (upload via Arduino IDE)
+
 ```
 
 ---
