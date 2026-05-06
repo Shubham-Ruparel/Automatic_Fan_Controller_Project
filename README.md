@@ -1,8 +1,8 @@
 # Automatic Temperature & Humidity Controller
 ### Fan Speed Control + Mist Regulation — Arduino Uno
 
-**Jay Patel** · **Shubham Ruparel** · **Harshal**  
-Electrical Engineering, IIT Gandhinagar
+**Jay Glasswala** · **Shubham Ruparel** · **Harshal Thanki**  
+ES 116 Project, IIT Gandhinagar
 
 ---
 
@@ -13,9 +13,9 @@ An embedded system that continuously monitors room temperature and humidity and 
 - **DC Fan** — speed controlled via PWM across four temperature zones
 - **Ultrasonic Mist Module** — switched on/off based on humidity threshold
 
-An LM35 temperature sensor is amplified 11× by an LM358 op-amp before being read by the Arduino ADC, giving reliable resolution across the 20–40°C operating range. A DHT11 sensor provides humidity data. A second LM358 configured as a comparator implements a **hardware interlock** that disables misting when humidity is too high, independently of software.
+An LM35 temperature sensor is amplified 11× by an LM358 non inverting op-amp before being read by the Arduino ADC, giving reliable resolution across the 20–40°C operating range. A DHT11 sensor provides humidity data. A second LM358 configured as a comparator implements a **hardware interlock** that disables misting when humidity is too high, independently of software (security layer over software).
 
-Real-time feedback is provided via a 16×2 I²C LCD and four colour-coded zone LEDs.
+Real-time feedback is provided via a 16×2 I2C LCD and four colour-coded zone LEDs.
 
 ---
 
@@ -32,7 +32,7 @@ Real-time feedback is provided via a 16×2 I²C LCD and four colour-coded zone L
   DHT11         ─────────────────► D7  (digital data)
   (Humidity)                       D8 ◄── LM358 IC2 ──► (HW interlock)
   10kΩ pull-up                     D6 ──────────────────────────────►  Mist
-                                   A4/A5 ──────────────────────────►  LCD I²C
+                                   A4/A5 ──────────────────────────►  LCD I2C
   LM358 IC2                        D2–D5 ──────────────────────────►  Zone LEDs
   (Comparator)
   2×10kΩ divider → 2.5V ref
@@ -55,7 +55,7 @@ Real-time feedback is provided via a 16×2 I²C LCD and four colour-coded zone L
 | DC Motor | INVENTO 6V–12V, 2.3mm shaft | Fan drive |
 | Fan Blade | 6-inch 3-blade, 2.3mm fit | Airflow |
 | Mist Module | 108kHz ultrasonic, 5V 400mA | Humidity actuation |
-| 16×2 LCD | I²C backpack, address 0x27 | Display |
+| 16×2 LCD | I2C backpack, address 0x27 | Display |
 | LEDs | Blue / Green / Yellow / Red | Zone indicator |
 | Resistors | 1kΩ, 10kΩ (×5), 220Ω (×4), 4.7kΩ | Various |
 | Capacitors | 10µF, 100µF | Decoupling |
@@ -78,11 +78,11 @@ Real-time feedback is provided via a 16×2 I²C LCD and four colour-coded zone L
 - OUT (Pin 1) → 10kΩ → Arduino D8 + 10kΩ pull-down to GND
 
 **L293D Fan Driver**
-- Pin 1 (Enable1) → Arduino D9 (PWM)
-- Pin 2 (Input1) → Arduino D12 (HIGH = forward)
-- Pin 7 (Input2) → GND
-- Pin 3 (O1) + Pin 6 (O2) → Fan motor terminals
-- Pins 4, 5, 12, 13 → GND | Pins 9, 16 → 5V | Pin 8 (VS) → 5V
+- Pin E1 (Enable1) → Arduino D9 (PWM)
+- Pin I1 (Input1) → Arduino D12 (HIGH = forward)
+- Pin I2 (Input2) → GND
+- Pin O1 + Pin O2 → Fan motor terminals
+- Pins -ve, GND → GND | Pin +ve → 5V | Pin VS → 5V
 
 **LEDs** (each with 220Ω series resistor)
 - D2 → Blue | D3 → Green | D4 → Yellow | D5 → Red
@@ -116,7 +116,7 @@ Install both libraries via **Arduino IDE → Tools → Manage Libraries**:
 - `DHT sensor library` by Adafruit
 - `LiquidCrystal I2C` by Frank de Brabander
 
-### LCD I²C Address
+### LCD I2C Address
 
 The default address in code is `0x27`. If your LCD shows nothing after upload, change the constructor in `main.ino`:
 
@@ -150,11 +150,11 @@ Original BOM specified DHT22 (±0.5°C, ±2% RH). Available component was DHT11 
 
 | Problem | Likely Cause | Fix |
 |---|---|---|
-| LCD blank, backlight on | Wrong I²C address | Change `0x27` → `0x3F` in code |
+| LCD blank, backlight on | Wrong I2C address | Change `0x27` → `0x3F` in code |
 | LCD blank, backlight off | Power/wiring issue | Check VCC and GND on LCD |
 | Temperature reads 0 or garbage | LM358 IC1 feedback wrong | Check: 1kΩ from Pin 2 to GND, 10kΩ from Pin 1 to Pin 2 |
 | Temperature reads very high | Wrong gain resistors | Verify Rf = 10kΩ, R1 = 1kΩ |
-| Fan doesn't spin at Zone 1 | L293D 1.4V dropout at 5V | Increase Zone 1 `fanPWM` from 76 to 110 in code |
+| Fan doesn't spin at Zone 1 | L293D 1.4V dropout at 5V | Increase Zone 1 `fanPWM` from 76 to 110 in code (which is on scale of 0 to 255)|
 | Fan spins backwards | Motor wires swapped | Swap O1 and O2 connections on L293D |
 | DHT11 always returns NaN | Missing pull-up | Add 10kΩ between D7 and 5V |
 | Upload fails (avrdude error) | Wire on D0 or D1 | Remove all wires from D0/D1 before uploading |
